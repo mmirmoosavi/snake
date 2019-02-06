@@ -134,6 +134,8 @@ class Player:
     updateCount = 0
 
     def __init__(self, length):
+        self.x = [0]
+        self.y = [0]
         self.length = length
         for i in range(0, 2000):
             self.x.append(-100)
@@ -142,6 +144,7 @@ class Player:
         # initial positions, no collision.
         self.x[1] = 1 * 44
         self.x[2] = 2 * 44
+
 
     def update(self):
 
@@ -390,8 +393,6 @@ class App:
         self.player = 0
         self.food = 0
         self.player = Player(1)
-        print(self.player.x)
-        print(self.player.y)
         self.food = Food(5, 5)
         self.run_game()
 
