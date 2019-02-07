@@ -11,13 +11,15 @@ white = (255, 255, 255)
 black = (0, 0, 0)
 red = (200, 0, 0)
 green = (0, 200, 0)
-
+clicked_green = (0, 100, 0)
+clicked_red = (100, 0, 0)
 bright_green = (0, 255, 0)
 bright_red = (255, 0, 0)
 
 clock = pygame.time.Clock()
 
 
+# abstract factory pattern
 class Background:
     __metaclass__ = ABCMeta
 
@@ -36,6 +38,12 @@ class WhiteBackground(Background):
 
     def draw(self, surface):
         surface.fill(white)
+
+
+class GreenBackground(Background):
+
+    def draw(self, surface):
+        surface.fill(green)
 
 
 class PlayerTheme:
@@ -58,6 +66,12 @@ class PlayerBlackTheme(PlayerTheme):
         return pygame.image.load("image/block.jpg").convert()
 
 
+class PlayerGreenTheme(PlayerTheme):
+
+    def image(self):
+        return pygame.image.load("image/block.jpg").convert()
+
+
 class FoodTheme:
     __metaclass__ = ABCMeta
 
@@ -73,6 +87,12 @@ class FoodWhiteTheme(FoodTheme):
 
 
 class FoodBlackTheme(FoodTheme):
+
+    def image(self):
+        return pygame.image.load("image/block.jpg").convert()
+
+
+class FoodGreenTheme(FoodTheme):
 
     def image(self):
         return pygame.image.load("image/block.jpg").convert()
@@ -110,6 +130,46 @@ class WhiteFactoryTheme(ThemeFactory):
         return FoodWhiteTheme()
 
 
+class GreenFactoryTheme(ThemeFactory):
+
+    def createbackground(self):
+        return GreenBackground()
+
+    def createplayer(self):
+        return PlayerGreenTheme()
+
+    def createfood(self):
+        return FoodGreenTheme()
+
+
+#####################################################
+
+class GameStrategy():
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
+    def speed(self):
+        pass
+
+
+class EasyStrategy(GameStrategy):
+
+    def speed(self):
+        return 15
+
+
+class MediumStratgey(GameStrategy):
+
+    def speed(self):
+        return 100
+
+
+class HardStrategy(GameStrategy):
+
+    def speed(self):
+        return 285
+
+
 class Food:
     x = 0
     y = 0
@@ -144,7 +204,6 @@ class Player:
         # initial positions, no collision.
         self.x[1] = 1 * 44
         self.x[2] = 2 * 44
-
 
     def update(self):
 
@@ -192,6 +251,8 @@ class App:
     Food = 0
 
     def __init__(self):
+        self.game_strategy = EasyStrategy()
+        self.speed = self.game_strategy.speed()
         self._themefactory = BlackFactoryTheme()
         self.paused = False
         self._running = True
@@ -202,7 +263,6 @@ class App:
         self._food_surf = self._themefactory.createfood()
         self.player = Player(1)
         self.food = Food(5, 5)
-
 
     def on_event(self, event):
         if event.type == QUIT:
@@ -249,8 +309,8 @@ class App:
             keys = pygame.key.get_pressed()
 
             self._display_surf.fill((0, 0, 0))
-            self.button("Play Again", 150, 450, 100, 50, green, bright_green, self.restart_game)
-            self.button("Quit", 750, 450, 100, 50, red, bright_red, self.quit_game)
+            self.button("Play Again", 150, 450, 100, 50, green, bright_green, clicked_green, self.restart_game)
+            self.button("Quit", 750, 450, 100, 50, red, bright_red, clicked_red, self.quit_game)
             self.message_display("Gameover", 30, self.windowWidth / 2, self.windowHeight / 3)
             pygame.display.flip()
 
@@ -288,7 +348,8 @@ class App:
 
             self.on_loop()
             self.on_render()
-            clock.tick(15)
+
+            clock.tick(self.speed)
 
         self.quit_game()
 
@@ -308,8 +369,8 @@ class App:
                 self._running = False
 
             self._display_surf.fill((0, 0, 0))
-            self.button("Continue", 150, 450, 100, 50, green, bright_green, self.unpause)
-            self.button("Quit", 750, 450, 100, 50, red, bright_red, self.quit_game)
+            self.button("Continue", 150, 450, 100, 50, green, bright_green, clicked_green, self.unpause)
+            self.button("Quit", 750, 450, 100, 50, red, bright_red, clicked_red, self.quit_game)
             self.message_display("game paused", 30, self.windowWidth / 2, self.windowHeight / 3)
             pygame.display.flip()
 
@@ -338,9 +399,9 @@ class App:
             self._display_surf.fill(black)
             self.message_display('Snake game', 40, self.windowWidth / 2, self.windowHeight / 3)
 
-            self.button("PLAY", 150, 450, 100, 50, green, bright_green, self.run_game)
-            self.button("Setting", 450, 450, 100, 50, green, bright_green, self.choose_gameoptions)
-            self.button("Quit", 750, 450, 100, 50, red, bright_red, self.quit_game)
+            self.button("PLAY", 150, 450, 100, 50, green, bright_green, clicked_green, self.run_game)
+            self.button("Setting", 450, 450, 100, 50, green, bright_green, clicked_green, self.choose_gameoptions)
+            self.button("Quit", 750, 450, 100, 50, red, bright_red, clicked_red, self.quit_game)
             pygame.display.flip()
 
     def choose_gameoptions(self):
@@ -355,23 +416,29 @@ class App:
             self._display_surf.fill(black)
             self.message_display("Game Theme", 30, 130, 370)
             self.message_display("Difficulty", 30, 130, 470)
-            self.button("easy", 300, 450, 100, 50, green, bright_green, None)
-            self.button("medium", 500, 450, 100, 50, green, bright_green, None)
-            self.button("hard", 700, 450, 100, 50, red, bright_red, None)
-            self.button("black", 300, 350, 100, 50, green, bright_green, self.set_theme_start_game("black"))
-            self.button("white", 500, 350, 100, 50, green, bright_green, self.set_theme_start_game("white"))
-            self.button("green", 700, 350, 100, 50, red, bright_red, None)
-            self.button("Quit", 800, 600, 100, 50, red, bright_red, self.quit_game)
-            self.button("Play", 200, 600, 100, 50, green, bright_green, self.restart_game)
+            self.button("easy", 300, 450, 100, 50, green, bright_green, clicked_green, self.game_difficulty,"easy")
+            self.button("medium", 500, 450, 100, 50, green, bright_green, clicked_green, self.game_difficulty,"medium")
+            self.button("hard", 700, 450, 100, 50, green, bright_green, clicked_green, self.game_difficulty,"hard")
+
+            self.button("green", 700, 350, 100, 50, green, bright_green, clicked_green,
+                        self.set_theme_start_game,"green")
+            self.button("black", 300, 350, 100, 50, green, bright_green, clicked_green,
+                        self.set_theme_start_game,"black")
+            self.button("white", 500, 350, 100, 50, green, bright_green, clicked_green,
+                        self.set_theme_start_game,"white")
+
+            self.button("Quit", 800, 600, 100, 50, red, bright_red, clicked_red, self.quit_game)
+            self.button("Play", 200, 600, 100, 50, green, bright_green, clicked_green, self.run_game)
             pygame.display.flip()
 
-    def button(self, msg, x, y, w, h, inactive_color, active_color, action):
+    def button(self, msg, x, y, w, h, inactive_color, active_color, clicked_color, action, *action_parameters):
         mouse_pos = pygame.mouse.get_pos()
         clicked = pygame.mouse.get_pressed()
         if x < mouse_pos[0] < x + w and y < mouse_pos[1] < y + h:
             pygame.draw.rect(self._display_surf, active_color, (x, y, w, h))
             if clicked[0] == 1 and action is not None:
-                action()
+                action(*action_parameters)
+                pygame.draw.rect(self._display_surf, clicked_color, (x, y, w, h))
                 return
         else:
             pygame.draw.rect(self._display_surf, inactive_color, (x, y, w, h))
@@ -379,22 +446,35 @@ class App:
         self.message_display(msg, 20, (x + (w / 2)), (y + (h / 2)))
 
     def set_theme_start_game(self, color):
-        if color == "black":
+        if color == "green":
+            self._themefactory = GreenFactoryTheme()
+        elif color == "black":
             self._themefactory = BlackFactoryTheme()
-        if color == "white":
+        elif color == "white":
             self._themefactory = WhiteFactoryTheme()
+
         self.background_obj = self._themefactory.createbackground()
         self._image_surf = self._themefactory.createplayer()
         self._food_surf = self._themefactory.createfood()
 
     def restart_game(self):
-        del self.player
-        del self.food
-        self.player = 0
-        self.food = 0
         self.player = Player(1)
         self.food = Food(5, 5)
         self.run_game()
+
+    def game_difficulty(self, difficulty):
+        if difficulty == "easy":
+            self.game_strategy = EasyStrategy()
+            self.speed = self.game_strategy.speed()
+
+        elif difficulty == "medium":
+            self.game_strategy = MediumStratgey()
+            self.speed = self.game_strategy.speed()
+
+        elif difficulty == "hard":
+            self.game_strategy = HardStrategy()
+            self.speed = self.game_strategy.speed()
+
 
 
 if __name__ == "__main__":
