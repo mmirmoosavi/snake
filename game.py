@@ -98,11 +98,34 @@ class FoodGreenTheme(FoodTheme):
         return pygame.image.load("image/block.jpg").convert()
 
 
-class ThemeFactory:
-    __metaclass__ = ABCMeta
+class Singleton(type):
+    """
+    Define an Instance operation that lets clients access its unique
+    instance.
+    """
+
+    def __init__(cls, name, bases, attrs, **kwargs):
+        super().__init__(name, bases, attrs)
+        cls._instance = None
+
+    def __call__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super().__call__(*args, **kwargs)
+        return cls._instance
+
+
+class ThemeFactory(metaclass=Singleton):
 
     @abstractmethod
     def createbackground(self):
+        pass
+
+    @abstractmethod
+    def createplayer(self):
+        pass
+
+    @abstractmethod
+    def createfood(self):
         pass
 
 
@@ -251,6 +274,7 @@ class Player:
         smallfont = pygame.font.Font("freesansbold.ttf", 25)
         text = smallfont.render("SCORE: " + str(self.length - 1), True, yellow)
         surface.blit(text, [x, y])
+
 
 class App:
     windowWidth = 1000
@@ -425,16 +449,16 @@ class App:
             self._display_surf.fill(black)
             self.message_display("Game Theme", 30, 130, 370)
             self.message_display("Difficulty", 30, 130, 470)
-            self.button("easy", 300, 450, 100, 50, green, bright_green, clicked_green, self.game_difficulty,"easy")
-            self.button("medium", 500, 450, 100, 50, green, bright_green, clicked_green, self.game_difficulty,"medium")
-            self.button("hard", 700, 450, 100, 50, green, bright_green, clicked_green, self.game_difficulty,"hard")
+            self.button("easy", 300, 450, 100, 50, green, bright_green, clicked_green, self.game_difficulty, "easy")
+            self.button("medium", 500, 450, 100, 50, green, bright_green, clicked_green, self.game_difficulty, "medium")
+            self.button("hard", 700, 450, 100, 50, green, bright_green, clicked_green, self.game_difficulty, "hard")
 
             self.button("green", 700, 350, 100, 50, green, bright_green, clicked_green,
-                        self.set_theme_start_game,"green")
+                        self.set_theme_start_game, "green")
             self.button("black", 300, 350, 100, 50, green, bright_green, clicked_green,
-                        self.set_theme_start_game,"black")
+                        self.set_theme_start_game, "black")
             self.button("white", 500, 350, 100, 50, green, bright_green, clicked_green,
-                        self.set_theme_start_game,"white")
+                        self.set_theme_start_game, "white")
 
             self.button("Quit", 800, 600, 100, 50, red, bright_red, clicked_red, self.quit_game)
             self.button("Play", 200, 600, 100, 50, green, bright_green, clicked_green, self.run_game)
@@ -483,7 +507,6 @@ class App:
         elif difficulty == "hard":
             self.game_strategy = HardStrategy()
             self.speed = self.game_strategy.speed()
-
 
 
 if __name__ == "__main__":
