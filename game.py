@@ -15,7 +15,7 @@ clicked_green = (0, 100, 0)
 clicked_red = (100, 0, 0)
 bright_green = (0, 255, 0)
 bright_red = (255, 0, 0)
-
+yellow = (255, 255, 0)
 clock = pygame.time.Clock()
 
 
@@ -228,21 +228,29 @@ class Player:
             self.updateCount = 0
 
     def moveRight(self):
-        self.direction = 0
+        if self.direction != 1:
+            self.direction = 0
 
     def moveLeft(self):
-        self.direction = 1
+        if self.direction != 0:
+            self.direction = 1
 
     def moveUp(self):
-        self.direction = 2
+        if self.direction != 3:
+            self.direction = 2
 
     def moveDown(self):
-        self.direction = 3
+        if self.direction != 2:
+            self.direction = 3
 
     def draw(self, surface, image):
         for i in range(0, self.length):
             surface.blit(image, (self.x[i], self.y[i]))
 
+    def draw_score(self, surface, x, y):
+        smallfont = pygame.font.Font("freesansbold.ttf", 25)
+        text = smallfont.render("SCORE: " + str(self.length - 1), True, yellow)
+        surface.blit(text, [x, y])
 
 class App:
     windowWidth = 1000
@@ -274,8 +282,8 @@ class App:
         # does snake eat apple?
         for i in range(0, self.player.length):
             if self.is_collision(self.food.x, self.food.y, self.player.x[i], self.player.y[i], 44):
-                self.food.x = randint(2, 9) * 44
-                self.food.y = randint(2, 9) * 44
+                self.food.x = randint(2, 21) * 44
+                self.food.y = randint(2, 17) * 44
                 self.player.length = self.player.length + 1
 
         # does snake collide with itself?
@@ -286,6 +294,7 @@ class App:
     def on_render(self):
         self.background_obj.draw(self._display_surf)
         self.player.draw(self._display_surf, self._image_surf.image())
+        self.player.draw_score(self._display_surf, 860, 0)
         self.food.draw(self._display_surf, self._food_surf.image())
         pygame.display.flip()
 
