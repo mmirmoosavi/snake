@@ -83,7 +83,7 @@ class PlayerTheme:
 class PlayerWhiteTheme(PlayerTheme):
 
     def image(self):
-        return pygame.image.load("image/block.png").convert()
+        return pygame.image.load("image/block_2.gif").convert()
 
 
 # concrete product Player
@@ -97,7 +97,7 @@ class PlayerBlackTheme(PlayerTheme):
 class PlayerGreenTheme(PlayerTheme):
 
     def image(self):
-        return pygame.image.load("image/block.png").convert()
+        return pygame.image.load("image/block1.jpg").convert()
 
 
 # abstract factory class
@@ -157,7 +157,7 @@ class GameStrategy():
 class EasyStrategy(GameStrategy):
 
     def speed(self):
-        return 15
+        return 40
 
 
 class MediumStratgey(GameStrategy):
@@ -169,7 +169,7 @@ class MediumStratgey(GameStrategy):
 class HardStrategy(GameStrategy):
 
     def speed(self):
-        return 285
+        return 200
 
 
 ############################################################
@@ -474,6 +474,9 @@ class App:
             if self.is_collision(self.player.x[0], self.player.y[0], self.player.x[i], self.player.y[i], 19):
                 self.game_over()
 
+        if self.player.x[0] > 1000 or self.player.y[0] > 800 or self.player.x[0] < 0 or self.player.y[0] < 0 :
+            self.game_over()
+
     def on_render(self):
         self.background_obj.draw(self._display_surf)
         self.player.draw(self._display_surf, self._image_surf.image())
@@ -667,7 +670,7 @@ class App:
     def restart_game(self):
         self.player = Player(1)
         self.reverse_direction = False
-        self.food = LengthItem(5, 5)
+        self.food = self.food_factory.createfood("length", randint(1, 20), randint(1, 15))
         self.game_strategy = EasyStrategy()
         self.speed = self.game_strategy.speed()
         self.run_game()
