@@ -83,51 +83,21 @@ class PlayerTheme:
 class PlayerWhiteTheme(PlayerTheme):
 
     def image(self):
-        return pygame.image.load("image/block.jpg").convert()
+        return pygame.image.load("image/block.png").convert()
 
 
 # concrete product Player
 class PlayerBlackTheme(PlayerTheme):
 
     def image(self):
-        return pygame.image.load("image/block.jpg").convert()
+        return pygame.image.load("image/block.png").convert()
 
 
 # concrete product Player
 class PlayerGreenTheme(PlayerTheme):
 
     def image(self):
-        return pygame.image.load("image/block.jpg").convert()
-
-
-# abstract product Food
-class FoodTheme:
-    __metaclass__ = ABCMeta
-
-    @abstractmethod
-    def image(self):
-        pass
-
-
-# concrete product Food
-class FoodWhiteTheme(FoodTheme):
-
-    def image(self):
-        return pygame.image.load("image/block.jpg").convert()
-
-
-# concrete product Food
-class FoodBlackTheme(FoodTheme):
-
-    def image(self):
-        return pygame.image.load("image/block.jpg").convert()
-
-
-# concrete product Food
-class FoodGreenTheme(FoodTheme):
-
-    def image(self):
-        return pygame.image.load("image/block.jpg").convert()
+        return pygame.image.load("image/block.png").convert()
 
 
 # abstract factory class
@@ -141,10 +111,6 @@ class ThemeFactory(metaclass=Singleton):
     def createplayer(self):
         pass
 
-    @abstractmethod
-    def createfood(self):
-        pass
-
 
 # concrete factory class
 class BlackFactoryTheme(ThemeFactory):
@@ -155,8 +121,6 @@ class BlackFactoryTheme(ThemeFactory):
     def createplayer(self):
         return PlayerBlackTheme()
 
-    def createfood(self):
-        return FoodBlackTheme()
 
 
 # concrete factory class
@@ -168,9 +132,6 @@ class WhiteFactoryTheme(ThemeFactory):
     def createplayer(self):
         return PlayerWhiteTheme()
 
-    def createfood(self):
-        return FoodWhiteTheme()
-
 
 # concrete factory class
 class GreenFactoryTheme(ThemeFactory):
@@ -180,9 +141,6 @@ class GreenFactoryTheme(ThemeFactory):
 
     def createplayer(self):
         return PlayerGreenTheme()
-
-    def createfood(self):
-        return FoodGreenTheme()
 
 
 #####################################################
@@ -215,27 +173,158 @@ class HardStrategy(GameStrategy):
 
 
 ############################################################
+################### visitor pattern ########################
+NOT_IMPLEMENTED = "Not Implemented !!!!!!"
+class ItemVisitor():
+    __metaclass__ = ABCMeta
 
+    @abstractmethod
+    def visit_lengthItem(self, player, s):
+        raise NotImplementedError(NOT_IMPLEMENTED)
+
+    @abstractmethod
+    def visit_speedItem(self, player, s):
+        raise NotImplementedError(NOT_IMPLEMENTED)
+
+    # @abstractmethod
+    # def visit_skipWallItem(self, player, s):
+    #     raise NotImplementedError(NOT_IMPLEMENTED)
+
+    # @abstractmethod
+    # def visit_skipItselfItem(self, player, s):
+    #     raise NotImplementedError(NOT_IMPLEMENTED)
+
+    # @abstractmethod
+    # def visit_reverseItem(self, player, s):
+    #     raise NotImplementedError(NOT_IMPLEMENTED)
+
+    @abstractmethod
+    def visit_shortenItem(self, player, s):
+        raise NotImplementedError(NOT_IMPLEMENTED)
+
+
+class FoodItemVisitor(ItemVisitor):
+    def visit_lengthItem(self, player, s):
+        # raise NotImplementedError(NOT_IMPLEMENTED)
+        player.length = player.length + 1
+        player.score += 1
+
+    def visit_speedItem(self, player, s):
+        # raise NotImplementedError(NOT_IMPLEMENTED)
+        s.speed += 20
+
+    # def visit_skipWallItem(self, player, speed):
+    #     raise NotImplementedError(NOT_IMPLEMENTED)
+
+    # def visit_skipItselfItem(self, player, speed):
+    #     raise NotImplementedError(NOT_IMPLEMENTED)
+
+    def visit_reverseItem(self, player, s):
+        s.reverse_direction = True
+
+    def visit_shortenItem(self, player, s):
+        if (player.length > 1):
+            player.length -= 1
+
+##############################################################
 class Food:
+    __metaclass__ = ABCMeta
+
     x = 0
     y = 0
-    step = 44
+    step = 20
 
     def __init__(self, x, y):
         self.x = x * self.step
         self.y = y * self.step
 
+
+
+    @abstractmethod
+    def image(self):
+        pass
+
+    @abstractmethod
     def draw(self, surface, image):
         surface.blit(image, (self.x, self.y))
+
+    @abstractmethod
+    def accept(self, visitor, player, s):
+        raise NotImplementedError("Not Implemented !!!!!!")
+
+class LengthItem(Food):
+    def image(self):
+        return pygame.image.load("image/aubergine.png").convert()
+
+    def draw(self, surface, image):
+        surface.blit(image, (self.x, self.y))
+
+    def accept(self, visitor, player, s):
+        visitor.visit_lengthItem(player, s)
+
+
+class SpeedItem(Food):
+    def image(self):
+        return pygame.image.load("image/burger.png").convert()
+
+    def draw(self, surface, image):
+        surface.blit(image, (self.x, self.y))
+
+    def accept(self, visitor, player, s):
+        visitor.visit_speedItem(player, s)
+
+
+# class SkipWallItem(Food):
+#     def image(self):
+#         return pygame.image.load("image/cheese.png").convert()
+#
+#     def draw(self, surface, image):
+#         surface.blit(image, (self.x, self.y))
+#
+#     def accept(self, visitor, player, s):
+#         visitor.visit_skipWalItem(player, s)
+
+
+# class SkipItselfItem(Food):
+#     def image(self):
+#         return pygame.image.load("image/icecream.png").convert()
+#
+#     def draw(self, surface, image):
+#         surface.blit(image, (self.x, self.y))
+#
+#     def accept(self, visitor, player, s):
+#         visitor.visit_skipItselfItem(player, s)
+
+
+class ReverseItem(Food):
+    def image(self):
+        return pygame.image.load("image/lettuce.png").convert()
+
+    def draw(self, surface, image):
+        surface.blit(image, (self.x, self.y))
+
+    def accept(self, visitor, player, s):
+        visitor.visit_reverseItem(player, s)
+
+
+class ShortenItem(Food):
+    def image(self):
+        return pygame.image.load("image/watermelon.png").convert()
+
+    def draw(self, surface, image):
+        surface.blit(image, (self.x, self.y))
+
+    def accept(self, visitor, player, s):
+        visitor.visit_shortenItem(player, s)
 
 
 class Player:
     x = [0]
     y = [0]
-    step = 44
+    step = 20
     direction = 0
     length = 1
-
+    score = 0
     updateCountMax = 2
     updateCount = 0
 
@@ -248,8 +337,8 @@ class Player:
             self.y.append(-100)
 
         # initial positions, no collision.
-        self.x[1] = 1 * 44
-        self.x[2] = 2 * 44
+        self.x[1] = 1 * self.step
+        self.x[2] = 2 * self.step
 
     def update(self):
 
@@ -295,7 +384,7 @@ class Player:
 
     def draw_score(self, surface, x, y):
         smallfont = pygame.font.Font("freesansbold.ttf", 25)
-        text = smallfont.render("SCORE: " + str(self.length - 1), True, yellow)
+        text = smallfont.render("SCORE: " + str(self.score), True, yellow)
         surface.blit(text, [x, y])
 
 
@@ -310,15 +399,15 @@ class App:
         self.game_strategy = EasyStrategy()
         self.speed = self.game_strategy.speed()
         self._themefactory = BlackFactoryTheme()
+        self.reverse_direction = False
         self.paused = False
         self._running = True
         self._display_surf = None
         self.gameover = False
         self.background_obj = self._themefactory.createbackground()
         self._image_surf = self._themefactory.createplayer()
-        self._food_surf = self._themefactory.createfood()
         self.player = Player(1)
-        self.food = Food(5, 5)
+        self.food = LengthItem(5, 5)
 
     def on_event(self, event):
         if event.type == QUIT:
@@ -329,21 +418,45 @@ class App:
 
         # does snake eat apple?
         for i in range(0, self.player.length):
-            if self.is_collision(self.food.x, self.food.y, self.player.x[i], self.player.y[i], 44):
-                self.food.x = randint(2, 21) * 44
-                self.food.y = randint(2, 17) * 44
-                self.player.length = self.player.length + 1
+            if self.is_collision(self.food.x, self.food.y, self.player.x[i], self.player.y[i], 19):
+
+                v = FoodItemVisitor()
+                self.food.accept(v, self.player, self)
+
+
+                randomItem = randint(1, 100)
+
+                if 1 <= randomItem <= 70:
+                    self.food = LengthItem(self.food.x, self.food.y)
+
+                elif 71 <= randomItem <= 80:
+                    self.food = SpeedItem(self.food.x, self.food.y)
+
+                # elif randomItem == 3:
+                #     self.food = SkipItselfItem(self.food.x, self.food.y)
+
+                # elif randomItem == 4:
+                #     self.food = SkipWallItem(self.food.x, self.food.y)
+
+                elif 81 <= randomItem == 90:
+                    self.food = ReverseItem(self.food.x, self.food.y)
+
+                elif 91 <= randomItem <= 100:
+                    self.food = ShortenItem(self.food.x, self.food.y)
+
+                self.food.x = randint(2, 20) * 40
+                self.food.y = randint(2, 15) * 40
 
         # does snake collide with itself?
         for i in range(2, self.player.length):
-            if self.is_collision(self.player.x[0], self.player.y[0], self.player.x[i], self.player.y[i], 40):
+            if self.is_collision(self.player.x[0], self.player.y[0], self.player.x[i], self.player.y[i], 19):
                 self.game_over()
 
     def on_render(self):
         self.background_obj.draw(self._display_surf)
         self.player.draw(self._display_surf, self._image_surf.image())
         self.player.draw_score(self._display_surf, 860, 0)
-        self.food.draw(self._display_surf, self._food_surf.image())
+        self.food.draw(self._display_surf, self.food.image())
         pygame.display.flip()
 
     def is_collision(self, x1, y1, x2, y2, bsize):
@@ -376,7 +489,7 @@ class App:
         quit()
 
     def run_game(self):
-
+        counter = 0
         while self._running:
 
             while self.gameover:
@@ -384,18 +497,34 @@ class App:
                 self._running = False
             pygame.event.pump()
             keys = pygame.key.get_pressed()
+            if not self.reverse_direction:
+                if (keys[K_RIGHT]):
+                    self.player.moveRight()
 
-            if (keys[K_RIGHT]):
-                self.player.moveRight()
+                if (keys[K_LEFT]):
+                    self.player.moveLeft()
 
-            if (keys[K_LEFT]):
-                self.player.moveLeft()
+                if (keys[K_UP]):
+                    self.player.moveUp()
 
-            if (keys[K_UP]):
-                self.player.moveUp()
+                if (keys[K_DOWN]):
+                    self.player.moveDown()
+            elif self.reverse_direction:
+                counter += 1
+                if counter >= 200:
+                    self.reverse_direction = False
+                    counter = 0
+                if (keys[K_RIGHT]):
+                    self.player.moveLeft()
 
-            if (keys[K_DOWN]):
-                self.player.moveDown()
+                if (keys[K_LEFT]):
+                    self.player.moveRight()
+
+                if (keys[K_UP]):
+                    self.player.moveDown()
+
+                if (keys[K_DOWN]):
+                    self.player.moveUp()
 
             if (keys[K_ESCAPE]):
                 self._running = False
@@ -512,11 +641,13 @@ class App:
 
         self.background_obj = self._themefactory.createbackground()
         self._image_surf = self._themefactory.createplayer()
-        self._food_surf = self._themefactory.createfood()
 
     def restart_game(self):
         self.player = Player(1)
-        self.food = Food(5, 5)
+        self.reverse_direction = False
+        self.food = LengthItem(5, 5)
+        self.game_strategy = EasyStrategy()
+        self.speed = self.game_strategy.speed()
         self.run_game()
 
     def game_difficulty(self, difficulty):
