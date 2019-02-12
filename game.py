@@ -19,85 +19,7 @@ yellow = (255, 255, 0)
 clock = pygame.time.Clock()
 
 
-# abstract factory pattern
-class Background:
-    __metaclass__ = ABCMeta
-
-    @abstractmethod
-    def draw(self, surface):
-        pass
-
-
-class BlackBackground(Background):
-
-    def draw(self, surface):
-        surface.fill(black)
-
-
-class WhiteBackground(Background):
-
-    def draw(self, surface):
-        surface.fill(white)
-
-
-class GreenBackground(Background):
-
-    def draw(self, surface):
-        surface.fill(green)
-
-
-class PlayerTheme:
-    __metaclass__ = ABCMeta
-
-    @abstractmethod
-    def image(self):
-        pass
-
-
-class PlayerWhiteTheme(PlayerTheme):
-
-    def image(self):
-        return pygame.image.load("image/block.jpg").convert()
-
-
-class PlayerBlackTheme(PlayerTheme):
-
-    def image(self):
-        return pygame.image.load("image/block.jpg").convert()
-
-
-class PlayerGreenTheme(PlayerTheme):
-
-    def image(self):
-        return pygame.image.load("image/block.jpg").convert()
-
-
-class FoodTheme:
-    __metaclass__ = ABCMeta
-
-    @abstractmethod
-    def image(self):
-        pass
-
-
-class FoodWhiteTheme(FoodTheme):
-
-    def image(self):
-        return pygame.image.load("image/block.jpg").convert()
-
-
-class FoodBlackTheme(FoodTheme):
-
-    def image(self):
-        return pygame.image.load("image/block.jpg").convert()
-
-
-class FoodGreenTheme(FoodTheme):
-
-    def image(self):
-        return pygame.image.load("image/block.jpg").convert()
-
-
+################### singleton pattern ###################
 class Singleton(type):
     """
     Define an Instance operation that lets clients access its unique
@@ -114,6 +36,101 @@ class Singleton(type):
         return cls._instance
 
 
+################################################
+
+##################### abstract factory pattern#######################
+
+# abstract product Background
+class Background:
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
+    def draw(self, surface):
+        pass
+
+
+# concrete product Backgroud
+class BlackBackground(Background):
+
+    def draw(self, surface):
+        surface.fill(black)
+
+
+# concrete product Backgroud
+class WhiteBackground(Background):
+
+    def draw(self, surface):
+        surface.fill(white)
+
+
+# concrete product Backgroud
+class GreenBackground(Background):
+
+    def draw(self, surface):
+        surface.fill(green)
+
+
+# abstract product Player
+class PlayerTheme:
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
+    def image(self):
+        pass
+
+
+# concrete product Player
+class PlayerWhiteTheme(PlayerTheme):
+
+    def image(self):
+        return pygame.image.load("image/block.jpg").convert()
+
+
+# concrete product Player
+class PlayerBlackTheme(PlayerTheme):
+
+    def image(self):
+        return pygame.image.load("image/block.jpg").convert()
+
+
+# concrete product Player
+class PlayerGreenTheme(PlayerTheme):
+
+    def image(self):
+        return pygame.image.load("image/block.jpg").convert()
+
+
+# abstract product Food
+class FoodTheme:
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
+    def image(self):
+        pass
+
+
+# concrete product Food
+class FoodWhiteTheme(FoodTheme):
+
+    def image(self):
+        return pygame.image.load("image/block.jpg").convert()
+
+
+# concrete product Food
+class FoodBlackTheme(FoodTheme):
+
+    def image(self):
+        return pygame.image.load("image/block.jpg").convert()
+
+
+# concrete product Food
+class FoodGreenTheme(FoodTheme):
+
+    def image(self):
+        return pygame.image.load("image/block.jpg").convert()
+
+
+# abstract factory class
 class ThemeFactory(metaclass=Singleton):
 
     @abstractmethod
@@ -129,6 +146,7 @@ class ThemeFactory(metaclass=Singleton):
         pass
 
 
+# concrete factory class
 class BlackFactoryTheme(ThemeFactory):
 
     def createbackground(self):
@@ -141,6 +159,7 @@ class BlackFactoryTheme(ThemeFactory):
         return FoodBlackTheme()
 
 
+# concrete factory class
 class WhiteFactoryTheme(ThemeFactory):
 
     def createbackground(self):
@@ -153,6 +172,7 @@ class WhiteFactoryTheme(ThemeFactory):
         return FoodWhiteTheme()
 
 
+# concrete factory class
 class GreenFactoryTheme(ThemeFactory):
 
     def createbackground(self):
@@ -167,6 +187,7 @@ class GreenFactoryTheme(ThemeFactory):
 
 #####################################################
 
+############################ strategy pattern ################################
 class GameStrategy():
     __metaclass__ = ABCMeta
 
@@ -192,6 +213,8 @@ class HardStrategy(GameStrategy):
     def speed(self):
         return 285
 
+
+############################################################
 
 class Food:
     x = 0
@@ -276,6 +299,7 @@ class Player:
         surface.blit(text, [x, y])
 
 
+###################### game  main class #####################
 class App:
     windowWidth = 1000
     windowHeight = 800
