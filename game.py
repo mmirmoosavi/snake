@@ -173,6 +173,7 @@ class HardStrategy(GameStrategy):
 
 
 ############################################################
+
 ################### visitor pattern ########################
 NOT_IMPLEMENTED = "Not Implemented !!!!!!"
 class ItemVisitor():
@@ -226,7 +227,27 @@ class FoodItemVisitor(ItemVisitor):
         if (player.length > 1):
             player.length -= 1
 
-##############################################################
+#################### factory method pattern #####################################
+class FoodFactory():
+    def createfood(self, foodtype, *args):
+
+        if foodtype == "speed":
+            return SpeedItem(*args)
+        elif foodtype == "length":
+            return LengthItem(*args)
+        elif foodtype =="reverse":
+            return ReverseItem(*args)
+        elif foodtype == "skipwall":
+            pass
+        elif foodtype == "skipitself":
+            pass
+        elif foodtype == "short":
+            return ShortenItem(*args)
+
+
+#################################################################################
+
+################# different types of foods ######################################
 class Food:
     __metaclass__ = ABCMeta
 
@@ -316,7 +337,7 @@ class ShortenItem(Food):
 
     def accept(self, visitor, player, s):
         visitor.visit_shortenItem(player, s)
-
+#################################################################################
 
 class Player:
     x = [0]
@@ -407,7 +428,8 @@ class App:
         self.background_obj = self._themefactory.createbackground()
         self._image_surf = self._themefactory.createplayer()
         self.player = Player(1)
-        self.food = LengthItem(5, 5)
+        self.food_factory = FoodFactory()
+        self.food = self.food_factory.createfood("length", randint(1,20), randint(1,15))
 
     def on_event(self, event):
         if event.type == QUIT:
@@ -427,10 +449,10 @@ class App:
                 randomItem = randint(1, 100)
 
                 if 1 <= randomItem <= 70:
-                    self.food = LengthItem(self.food.x, self.food.y)
+                    self.food = self.food_factory.createfood("length",self.food.x, self.food.y)
 
                 elif 71 <= randomItem <= 80:
-                    self.food = SpeedItem(self.food.x, self.food.y)
+                    self.food = self.food_factory.createfood("speed", self.food.x, self.food.y)
 
                 # elif randomItem == 3:
                 #     self.food = SkipItselfItem(self.food.x, self.food.y)
@@ -439,10 +461,10 @@ class App:
                 #     self.food = SkipWallItem(self.food.x, self.food.y)
 
                 elif 81 <= randomItem == 90:
-                    self.food = ReverseItem(self.food.x, self.food.y)
+                    self.food = self.food_factory.createfood("reverse",self.food.x, self.food.y)
 
                 elif 91 <= randomItem <= 100:
-                    self.food = ShortenItem(self.food.x, self.food.y)
+                    self.food = self.food_factory.createfood("short",self.food.x, self.food.y)
 
                 self.food.x = randint(2, 20) * 40
                 self.food.y = randint(2, 15) * 40
