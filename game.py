@@ -378,6 +378,7 @@ class App:
     player = 0
     Food = 0
 
+    ###### constructor of APP
     def __init__(self):
         self.game_strategy = EasyStrategy()
         self.speed = self.game_strategy.speed()
@@ -397,6 +398,7 @@ class App:
         if event.type == QUIT:
             self._running = False
 
+    ################ update snake position and check for game over and food production
     def on_loop(self):
         self.player.update()
 
@@ -415,12 +417,6 @@ class App:
                 elif 71 <= randomItem <= 80:
                     self.food = self.food_factory.createfood("speed", self.food.x, self.food.y)
 
-                # elif randomItem == 3:
-                #     self.food = SkipItselfItem(self.food.x, self.food.y)
-
-                # elif randomItem == 4:
-                #     self.food = SkipWallItem(self.food.x, self.food.y)
-
                 elif 81 <= randomItem == 90:
                     self.food = self.food_factory.createfood("reverse", self.food.x, self.food.y)
 
@@ -438,6 +434,7 @@ class App:
         if self.player.x[0] > 1000 or self.player.y[0] > 800 or self.player.x[0] < 0 or self.player.y[0] < 0:
             self.game_over()
 
+    ######### for every frame draw display player and food
     def on_render(self):
         self.background_obj.draw(self._display_surf)
         self.player.draw(self._display_surf, self._image_surf.image())
@@ -445,19 +442,14 @@ class App:
         self.food.draw(self._display_surf, self.food.image())
         pygame.display.flip()
 
+    ######## method for collision of two things
     def is_collision(self, x1, y1, x2, y2, bsize):
         if x2 <= x1 <= x2 + bsize:
             if y2 <= y1 <= y2 + bsize:
                 return True
         return False
 
-    def out_of_screen(self):
-        # for i in range(self.player.length):
-        #     if self.player.x[i] >= self.windowWidth or self.player.x[i] < 0 or self.player.y[i]>=
-        if self.player.x[self.player.length] >= self.windowWidth or self.player.x[self.player.length] < 0 or \
-                self.player.y[self.player.length] >= self.windowHeight or self.player.y[self.player.length] < 0:
-            self.gameover = True
-
+    ######### game_over method
     def game_over(self):
 
         while True:
