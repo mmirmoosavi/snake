@@ -122,7 +122,6 @@ class BlackFactoryTheme(ThemeFactory):
         return PlayerBlackTheme()
 
 
-
 # concrete factory class
 class WhiteFactoryTheme(ThemeFactory):
 
@@ -176,6 +175,8 @@ class HardStrategy(GameStrategy):
 
 ################### visitor pattern ########################
 NOT_IMPLEMENTED = "Not Implemented !!!!!!"
+
+
 class ItemVisitor():
     __metaclass__ = ABCMeta
 
@@ -187,17 +188,9 @@ class ItemVisitor():
     def visit_speedItem(self, player, s):
         raise NotImplementedError(NOT_IMPLEMENTED)
 
-    # @abstractmethod
-    # def visit_skipWallItem(self, player, s):
-    #     raise NotImplementedError(NOT_IMPLEMENTED)
-
-    # @abstractmethod
-    # def visit_skipItselfItem(self, player, s):
-    #     raise NotImplementedError(NOT_IMPLEMENTED)
-
-    # @abstractmethod
-    # def visit_reverseItem(self, player, s):
-    #     raise NotImplementedError(NOT_IMPLEMENTED)
+    @abstractmethod
+    def visit_reverseItem(self, player, s):
+        raise NotImplementedError(NOT_IMPLEMENTED)
 
     @abstractmethod
     def visit_shortenItem(self, player, s):
@@ -206,26 +199,19 @@ class ItemVisitor():
 
 class FoodItemVisitor(ItemVisitor):
     def visit_lengthItem(self, player, s):
-        # raise NotImplementedError(NOT_IMPLEMENTED)
         player.length = player.length + 1
         player.score += 1
 
     def visit_speedItem(self, player, s):
-        # raise NotImplementedError(NOT_IMPLEMENTED)
         s.speed += 20
-
-    # def visit_skipWallItem(self, player, speed):
-    #     raise NotImplementedError(NOT_IMPLEMENTED)
-
-    # def visit_skipItselfItem(self, player, speed):
-    #     raise NotImplementedError(NOT_IMPLEMENTED)
 
     def visit_reverseItem(self, player, s):
         s.reverse_direction = True
 
     def visit_shortenItem(self, player, s):
-        if (player.length > 1):
+        if player.length > 1:
             player.length -= 1
+
 
 #################### factory method pattern #####################################
 class FoodFactory():
@@ -235,12 +221,8 @@ class FoodFactory():
             return SpeedItem(*args)
         elif foodtype == "length":
             return LengthItem(*args)
-        elif foodtype =="reverse":
+        elif foodtype == "reverse":
             return ReverseItem(*args)
-        elif foodtype == "skipwall":
-            pass
-        elif foodtype == "skipitself":
-            pass
         elif foodtype == "short":
             return ShortenItem(*args)
 
@@ -259,8 +241,6 @@ class Food:
         self.x = x * self.step
         self.y = y * self.step
 
-
-
     @abstractmethod
     def image(self):
         pass
@@ -272,6 +252,7 @@ class Food:
     @abstractmethod
     def accept(self, visitor, player, s):
         raise NotImplementedError("Not Implemented !!!!!!")
+
 
 class LengthItem(Food):
     def image(self):
@@ -295,28 +276,6 @@ class SpeedItem(Food):
         visitor.visit_speedItem(player, s)
 
 
-# class SkipWallItem(Food):
-#     def image(self):
-#         return pygame.image.load("image/cheese.png").convert()
-#
-#     def draw(self, surface, image):
-#         surface.blit(image, (self.x, self.y))
-#
-#     def accept(self, visitor, player, s):
-#         visitor.visit_skipWalItem(player, s)
-
-
-# class SkipItselfItem(Food):
-#     def image(self):
-#         return pygame.image.load("image/icecream.png").convert()
-#
-#     def draw(self, surface, image):
-#         surface.blit(image, (self.x, self.y))
-#
-#     def accept(self, visitor, player, s):
-#         visitor.visit_skipItselfItem(player, s)
-
-
 class ReverseItem(Food):
     def image(self):
         return pygame.image.load("image/lettuce.png").convert()
@@ -337,7 +296,10 @@ class ShortenItem(Food):
 
     def accept(self, visitor, player, s):
         visitor.visit_shortenItem(player, s)
+
+
 #################################################################################
+
 
 class Player:
     x = [0]
@@ -429,7 +391,7 @@ class App:
         self._image_surf = self._themefactory.createplayer()
         self.player = Player(1)
         self.food_factory = FoodFactory()
-        self.food = self.food_factory.createfood("length", randint(1,20), randint(1,15))
+        self.food = self.food_factory.createfood("length", randint(1, 20), randint(1, 15))
 
     def on_event(self, event):
         if event.type == QUIT:
@@ -445,11 +407,10 @@ class App:
                 v = FoodItemVisitor()
                 self.food.accept(v, self.player, self)
 
-
                 randomItem = randint(1, 100)
 
                 if 1 <= randomItem <= 70:
-                    self.food = self.food_factory.createfood("length",self.food.x, self.food.y)
+                    self.food = self.food_factory.createfood("length", self.food.x, self.food.y)
 
                 elif 71 <= randomItem <= 80:
                     self.food = self.food_factory.createfood("speed", self.food.x, self.food.y)
@@ -461,10 +422,10 @@ class App:
                 #     self.food = SkipWallItem(self.food.x, self.food.y)
 
                 elif 81 <= randomItem == 90:
-                    self.food = self.food_factory.createfood("reverse",self.food.x, self.food.y)
+                    self.food = self.food_factory.createfood("reverse", self.food.x, self.food.y)
 
                 elif 91 <= randomItem <= 100:
-                    self.food = self.food_factory.createfood("short",self.food.x, self.food.y)
+                    self.food = self.food_factory.createfood("short", self.food.x, self.food.y)
 
                 self.food.x = randint(2, 20) * 40
                 self.food.y = randint(2, 15) * 40
@@ -474,7 +435,7 @@ class App:
             if self.is_collision(self.player.x[0], self.player.y[0], self.player.x[i], self.player.y[i], 19):
                 self.game_over()
 
-        if self.player.x[0] > 1000 or self.player.y[0] > 800 or self.player.x[0] < 0 or self.player.y[0] < 0 :
+        if self.player.x[0] > 1000 or self.player.y[0] > 800 or self.player.x[0] < 0 or self.player.y[0] < 0:
             self.game_over()
 
     def on_render(self):
